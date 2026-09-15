@@ -21,5 +21,5 @@ interface LinkTypeInterface
 
     public function renderInputHtml(Link $link, array $context): string;
 
-    public function validate(Link $link): bool;
+    public function validateLink(Link $link): bool;
 }

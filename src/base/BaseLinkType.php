@@ -30,7 +30,7 @@ abstract class BaseLinkType extends Component implements LinkTypeInterface
         return $link->customText ?: $this->getUrl($link);
     }
 
-    public function validate(Link $link): bool
+    public function validateLink(Link $link): bool
     {
         return !empty($link->value) || !empty($link->elementId);
     }

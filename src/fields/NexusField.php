@@ -60,10 +60,42 @@ class NexusField extends Field
             ];
         }
 
+        $styleRows = [];
+        if (is_array($this->availableStyles)) {
+            foreach ($this->availableStyles as $key => $val) {
+                if (is_array($val) && isset($val['handle'])) {
+                    $styleRows[] = $val;
+                } else {
+                    $styleRows[] = [
+                        'handle' => is_string($key) ? $key : ($val['handle'] ?? ''),
+                        'label' => is_string($val) ? $val : ($val['label'] ?? ''),
+                    ];
+                }
+            }
+        }
+
         return Craft::$app->getView()->renderTemplate('tka-nexus/_field/settings', [
             'field' => $this,
             'linkTypeOptions' => $linkTypeOptions,
+            'styleRows' => $styleRows,
         ]);
+    }
+
+    public function setAvailableStyles(mixed $styles): void
+    {
+        if (is_array($styles)) {
+            $normalized = [];
+            foreach ($styles as $key => $row) {
+                if (is_array($row) && !empty($row['handle'])) {
+                    $normalized[$row['handle']] = $row['label'] ?? $row['handle'];
+                } elseif (is_string($row)) {
+                    $normalized[$key] = $row;
+                }
+            }
+            $this->availableStyles = $normalized;
+        } else {
+            $this->availableStyles = [];
+        }
     }
 
     public function normalizeValue(mixed $value, ?ElementInterface $element = null): mixed
