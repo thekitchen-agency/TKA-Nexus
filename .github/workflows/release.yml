@@ -17,18 +17,22 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Create Release on Tag Push
         if: github.event_name == 'push'
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ github.ref_name }}
-          tag_name: ${{ github.ref_name }}
-          generate_release_notes: true
-          draft: false
-          prerelease: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # If release already exists, update it; otherwise create it
+          if gh release view "${{ github.ref_name }}" > /dev/null 2>&1; then
+            echo "Release already exists for ${{ github.ref_name }}"
+          else
+            gh release create "${{ github.ref_name }}" \
+              --title "${{ github.ref_name }}" \
+              --generate-notes
+          fi
 
       - name: Create Release from Craft Plugin Store
         if: github.event_name == 'repository_dispatch'
