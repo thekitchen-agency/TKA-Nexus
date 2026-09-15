@@ -1,0 +1,91 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.checkboxGroupField({
+  label: "Allowed Link Types"|t('tka-nexus'),
+  instructions: "Select which link destination types should be available."|t('tka-nexus'),
+  name: 'allowedLinkTypes',
+  values: field.allowedLinkTypes,
+  options: linkTypeOptions,
+}) }}
+
+{{ forms.lightswitchField({
+  label: "Allow Custom Text"|t('tka-nexus'),
+  instructions: "Whether content editors can override the link text."|t('tka-nexus'),
+  name: 'allowCustomText',
+  on: field.allowCustomText,
+}) }}
+
+{{ forms.lightswitchField({
+  label: "Allow Target Selection"|t('tka-nexus'),
+  instructions: "Allow editors to choose whether the link opens in a new window."|t('tka-nexus'),
+  name: 'allowTarget',
+  on: field.allowTarget,
+}) }}
+
+{{ forms.selectField({
+  label: "Default Target"|t('tka-nexus'),
+  name: 'defaultTarget',
+  value: field.defaultTarget,
+  options: [
+    { label: "Same Window (_self)"|t('tka-nexus'), value: '_self' },
+    { label: "New Window (_blank)"|t('tka-nexus'), value: '_blank' },
+  ]
+}) }}
+
+{{ forms.lightswitchField({
+  label: "Allow CTA / Button Styles"|t('tka-nexus'),
+  instructions: "Allow editors to choose a visual style preset (e.g. Primary, Secondary)."|t('tka-nexus'),
+  name: 'allowStyle',
+  on: field.allowStyle,
+}) }}
+
+{{ forms.editableTableField({
+  label: "Available Button Styles"|t('tka-nexus'),
+  instructions: "Define style keys and labels available for selection in this field."|t('tka-nexus'),
+  name: 'availableStyles',
+  id: 'availableStyles',
+  cols: {
+    handle: {
+      type: 'singleline',
+      heading: 'Class / Key'|t('tka-nexus'),
+      placeholder: 'primary',
+      code: true,
+      width: '40%'
+    },
+    label: {
+      type: 'singleline',
+      heading: 'Label'|t('tka-nexus'),
+      placeholder: 'Primary Button',
+      width: '60%'
+    }
+  },
+  rows: field.availableStyles is iterable ? field.availableStyles : [],
+}) }}
+
+{{ forms.lightswitchField({
+  label: "Allow Icon Picker"|t('tka-nexus'),
+  instructions: "Allow editors to select an icon associated with this link."|t('tka-nexus'),
+  name: 'allowIcon',
+  on: field.allowIcon,
+}) }}
+
+{{ forms.lightswitchField({
+  label: "Allow Page Anchors"|t('tka-nexus'),
+  instructions: "Allow editors to append a hash/anchor (e.g. #contact) to links."|t('tka-nexus'),
+  name: 'allowAnchor',
+  on: field.allowAnchor,
+}) }}
+
+{{ forms.lightswitchField({
+  label: "Allow UTM Campaign Parameters"|t('tka-nexus'),
+  instructions: "Allow editors to specify UTM parameters for campaign tracking on external links."|t('tka-nexus'),
+  name: 'allowUtm',
+  on: field.allowUtm,
+}) }}
+
+{{ forms.lightswitchField({
+  label: "Allow Aria Label"|t('tka-nexus'),
+  instructions: "Allow custom accessibility aria-label overrides."|t('tka-nexus'),
+  name: 'allowAriaLabel',
+  on: field.allowAriaLabel,
+}) }}

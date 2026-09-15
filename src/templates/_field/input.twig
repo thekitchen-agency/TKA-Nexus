@@ -1,0 +1,162 @@
+{% import "_includes/forms" as forms %}
+
+<div class="nexus-field-container" id="{{ name }}-container">
+  <input type="hidden" class="nexus-type-value" name="{{ name }}[type]" value="{{ currentType }}">
+
+  <div class="nexus-header">
+    <div class="nexus-type-tabs">
+      {% for typeKey, typeObj in availableTypes %}
+        <button type="button" 
+                class="nexus-type-tab {% if typeKey == currentType %}is-active{% endif %}" 
+                data-type="{{ typeKey }}">
+          {{ typeObj.displayName() }}
+        </button>
+      {% endfor %}
+    </div>
+
+    <button type="button" class="nexus-toggle-details-btn" aria-expanded="false">
+      <span>{{ "Options & Attributes"|t('tka-nexus') }}</span>
+      <span aria-hidden="true">&darr;</span>
+    </button>
+  </div>
+
+  <div class="nexus-body">
+    <!-- Type specific inputs -->
+    <div class="nexus-type-panels">
+      {% for typeKey, typeObj in availableTypes %}
+        <div class="nexus-type-content" data-type="{{ typeKey }}" style="display: {{ typeKey == currentType ? 'block' : 'none' }};">
+          {{ typeObj.renderInputHtml(link, { name: name, sources: field.allowedSources })|raw }}
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Link Text Input -->
+    {% if field.allowCustomText %}
+      <div class="nexus-input-row">
+        <div class="nexus-input-col">
+          {{ forms.textField({
+            label: "Link Text"|t('tka-nexus'),
+            instructions: "Leave blank to auto-fill with target element title."|t('tka-nexus'),
+            name: name ~ '[customText]',
+            value: link.customText,
+            placeholder: link.text ?: "e.g. Learn More",
+          }) }}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Resolved URL Preview -->
+    {% if link.url %}
+      <div class="nexus-preview-bar">
+        <span><strong>{{ "Destination:"|t('tka-nexus') }}</strong> <span class="nexus-preview-url">{{ link.url }}</span></span>
+        {% if link.isExternal %}
+          <span class="badge" style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-size:11px;">External</span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Advanced Details Panel -->
+    <div class="nexus-details-panel is-hidden">
+      {% if field.allowTarget %}
+        <div>
+          {{ forms.selectField({
+            label: "Target"|t('tka-nexus'),
+            name: name ~ '[target]',
+            value: link.target ?: field.defaultTarget,
+            options: [
+              { label: "Same Window (_self)"|t('tka-nexus'), value: '_self' },
+              { label: "New Window (_blank)"|t('tka-nexus'), value: '_blank' },
+            ]
+          }) }}
+        </div>
+      {% endif %}
+
+      {% if field.allowStyle and field.availableStyles|length %}
+        <div>
+          {% set styleOptions = [{ label: "Default"|t('tka-nexus'), value: '' }] %}
+          {% for styleKey, styleLabel in field.availableStyles %}
+            {% set styleOptions = styleOptions|merge([{ label: styleLabel, value: styleKey }]) %}
+          {% endfor %}
+          {{ forms.selectField({
+            label: "Button / CTA Style"|t('tka-nexus'),
+            name: name ~ '[style]',
+            value: link.style,
+            options: styleOptions,
+          }) }}
+        </div>
+      {% endif %}
+
+      {% if field.allowAnchor %}
+        <div>
+          {{ forms.textField({
+            label: "Anchor / Jump Link"|t('tka-nexus'),
+            name: name ~ '[anchor]',
+            value: link.anchor,
+            placeholder: "#section-name",
+          }) }}
+        </div>
+      {% endif %}
+
+      {% if field.allowAriaLabel %}
+        <div>
+          {{ forms.textField({
+            label: "Aria Label"|t('tka-nexus'),
+            name: name ~ '[ariaLabel]',
+            value: link.ariaLabel,
+            placeholder: "Accessibility label",
+          }) }}
+        </div>
+      {% endif %}
+
+      {% if field.allowTitle %}
+        <div>
+          {{ forms.textField({
+            label: "Title Attribute"|t('tka-nexus'),
+            name: name ~ '[title]',
+            value: link.title,
+            placeholder: "Hover title",
+          }) }}
+        </div>
+      {% endif %}
+
+      {% if field.allowUtm %}
+        <div style="grid-column: 1 / -1; border-top: 1px dashed var(--hairline-color); padding-top: 10px; margin-top: 4px;">
+          <label style="font-weight:600; font-size:12px; margin-bottom:8px; display:block;">{{ "UTM Campaign Builder"|t('tka-nexus') }}</label>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:8px;">
+            {{ forms.textField({
+              placeholder: "utm_source",
+              name: name ~ '[utmParams][utm_source]',
+              value: link.utmParams.utm_source ?? '',
+            }) }}
+            {{ forms.textField({
+              placeholder: "utm_medium",
+              name: name ~ '[utmParams][utm_medium]',
+              value: link.utmParams.utm_medium ?? '',
+            }) }}
+            {{ forms.textField({
+              placeholder: "utm_campaign",
+              name: name ~ '[utmParams][utm_campaign]',
+              value: link.utmParams.utm_campaign ?? '',
+            }) }}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if field.allowIcon and icons|length %}
+        <div style="grid-column: 1 / -1; border-top: 1px dashed var(--hairline-color); padding-top: 10px; margin-top: 4px;">
+          <label style="font-weight:600; font-size:12px; margin-bottom:8px; display:block;">{{ "Icon"|t('tka-nexus') }}</label>
+          <input type="hidden" class="nexus-icon-value" name="{{ name }}[icon]" value="{{ link.icon }}">
+          <div class="nexus-icon-grid">
+            {% for iconKey, iconSvg in icons %}
+              <div class="nexus-icon-item {% if link.icon == iconKey %}is-selected{% endif %}" 
+                   data-icon="{{ iconKey }}" 
+                   title="{{ iconKey }}">
+                {{ iconSvg|raw }}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

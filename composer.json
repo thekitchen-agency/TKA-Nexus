@@ -1,0 +1,56 @@
+{
+  "name": "thekitchen-agency/craft-tka-nexus",
+  "description": "A modern, high-performance link field plugin for Craft CMS 5 with smart CTA styles, UTM builder, icons, and native relation tracking.",
+  "keywords": [
+    "craft",
+    "craftcms",
+    "craft-plugin",
+    "link",
+    "link-field",
+    "hyperlink",
+    "cta",
+    "navigation"
+  ],
+  "homepage": "https://thekitchen.agency",
+  "type": "craft-plugin",
+  "license": "proprietary",
+  "support": {
+    "email": "tech@thekitchen.agency"
+  },
+  "require": {
+    "php": ">=8.2",
+    "craftcms/cms": "^5.0.0"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main"
+  },
+  "autoload": {
+    "psr-4": {
+      "thekitchenagency\\nexus\\": "src/"
+    }
+  },
+  "extra": {
+    "handle": "tka-nexus",
+    "name": "Nexus",
+    "developer": "thekitchen.agency",
+    "developerUrl": "https://thekitchen.agency",
+    "documentationUrl": "https://github.com/thekitchen-agency/craft-tka-nexus#readme",
+    "class": "thekitchenagency\\nexus\\Nexus"
+  },
+  "scripts": {
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix",
+    "phpstan": "phpstan --memory-limit=1G"
+  },
+  "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "8.2"
+    },
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
+  }
+}
