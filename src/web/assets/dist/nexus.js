@@ -10,6 +10,7 @@
     const detailsPanel = container.querySelector('.nexus-details-panel');
     const iconItems = container.querySelectorAll('.nexus-icon-item');
     const iconHidden = container.querySelector('.nexus-icon-value');
+    const clearIconBtn = container.querySelector('.nexus-clear-icon-btn');
 
     // Type tab switching
     typeTabs.forEach(tab => {
@@ -33,6 +34,7 @@
       toggleDetailsBtn.addEventListener('click', (e) => {
         e.preventDefault();
         const isHidden = detailsPanel.classList.toggle('is-hidden');
+        toggleDetailsBtn.classList.toggle('is-open', !isHidden);
         toggleDetailsBtn.setAttribute('aria-expanded', !isHidden);
       });
     }
@@ -54,6 +56,15 @@
             iconHidden.value = iconName;
           }
         });
+      });
+    }
+
+    // Clear icon button
+    if (clearIconBtn && iconHidden) {
+      clearIconBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        iconItems.forEach(i => i.classList.remove('is-selected'));
+        iconHidden.value = '';
       });
     }
   }

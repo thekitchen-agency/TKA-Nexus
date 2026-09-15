@@ -15,13 +15,19 @@
     </div>
 
     <button type="button" class="nexus-toggle-details-btn" aria-expanded="false">
-      <span>{{ "Options & Attributes"|t('tka-nexus') }}</span>
-      <span aria-hidden="true">&darr;</span>
+      <svg class="nexus-gear" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      <span>{{ "Customize"|t('tka-nexus') }}</span>
+      <svg class="nexus-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
     </button>
   </div>
 
   <div class="nexus-body">
-    <!-- Type specific inputs -->
+    <!-- Type specific element / text inputs -->
     <div class="nexus-type-panels">
       {% for typeKey, typeObj in availableTypes %}
         <div class="nexus-type-content" data-type="{{ typeKey }}" style="display: {{ typeKey == currentType ? 'block' : 'none' }};">
@@ -32,48 +38,45 @@
 
     <!-- Link Text Input -->
     {% if field.allowCustomText %}
-      <div class="nexus-input-row">
-        <div class="nexus-input-col">
-          {{ forms.textField({
-            label: "Link Text"|t('tka-nexus'),
-            instructions: "Leave blank to auto-fill with target element title."|t('tka-nexus'),
-            name: name ~ '[customText]',
-            value: link.customText,
-            placeholder: link.text ?: "e.g. Learn More",
-          }) }}
-        </div>
+      <div class="nexus-text-row">
+        {{ forms.textField({
+          label: "Link Text"|t('tka-nexus'),
+          instructions: "Optional override. Defaults to target element title or file name."|t('tka-nexus'),
+          name: name ~ '[customText]',
+          value: link.customText,
+          placeholder: link.text ?: "e.g. Discover More",
+        }) }}
       </div>
     {% endif %}
 
-    <!-- Resolved URL Preview -->
+    <!-- Resolved Destination Bar -->
     {% if link.url %}
       <div class="nexus-preview-bar">
-        <span><strong>{{ "Destination:"|t('tka-nexus') }}</strong> <span class="nexus-preview-url">{{ link.url }}</span></span>
+        <span><strong>{{ "Resolved URL:"|t('tka-nexus') }}</strong> <span class="nexus-preview-url">{{ link.url }}</span></span>
         {% if link.isExternal %}
-          <span class="badge" style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-size:11px;">External</span>
+          <span class="badge" style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600;">External</span>
         {% endif %}
       </div>
     {% endif %}
 
-    <!-- Advanced Details Panel -->
+    <!-- Options & Attributes Panel -->
     <div class="nexus-details-panel is-hidden">
-      {% if field.allowTarget %}
-        <div>
+      <!-- General Link Properties Grid -->
+      <div class="nexus-grid-2">
+        {% if field.allowTarget %}
           {{ forms.selectField({
             label: "Target"|t('tka-nexus'),
             name: name ~ '[target]',
             value: link.target ?: field.defaultTarget,
             options: [
-              { label: "Same Window (_self)"|t('tka-nexus'), value: '_self' },
-              { label: "New Window (_blank)"|t('tka-nexus'), value: '_blank' },
+              { label: "Same Tab (_self)"|t('tka-nexus'), value: '_self' },
+              { label: "New Tab (_blank)"|t('tka-nexus'), value: '_blank' },
             ]
           }) }}
-        </div>
-      {% endif %}
+        {% endif %}
 
-      {% if field.allowStyle and field.availableStyles|length %}
-        <div>
-          {% set styleOptions = [{ label: "Default"|t('tka-nexus'), value: '' }] %}
+        {% if field.allowStyle and field.availableStyles|length %}
+          {% set styleOptions = [{ label: "Default Style"|t('tka-nexus'), value: '' }] %}
           {% for styleKey, styleLabel in field.availableStyles %}
             {% set styleOptions = styleOptions|merge([{ label: styleLabel, value: styleKey }]) %}
           {% endfor %}
@@ -83,77 +86,80 @@
             value: link.style,
             options: styleOptions,
           }) }}
-        </div>
-      {% endif %}
+        {% endif %}
 
-      {% if field.allowAnchor %}
-        <div>
+        {% if field.allowAnchor %}
           {{ forms.textField({
             label: "Anchor / Jump Link"|t('tka-nexus'),
             name: name ~ '[anchor]',
             value: link.anchor,
             placeholder: "#section-name",
           }) }}
-        </div>
-      {% endif %}
+        {% endif %}
 
-      {% if field.allowAriaLabel %}
-        <div>
+        {% if field.allowAriaLabel %}
           {{ forms.textField({
             label: "Aria Label"|t('tka-nexus'),
             name: name ~ '[ariaLabel]',
             value: link.ariaLabel,
             placeholder: "Accessibility label",
           }) }}
-        </div>
-      {% endif %}
+        {% endif %}
 
-      {% if field.allowTitle %}
-        <div>
+        {% if field.allowTitle %}
           {{ forms.textField({
             label: "Title Attribute"|t('tka-nexus'),
             name: name ~ '[title]',
             value: link.title,
             placeholder: "Hover title",
           }) }}
-        </div>
-      {% endif %}
+        {% endif %}
+      </div>
 
+      <!-- UTM Builder Section -->
       {% if field.allowUtm %}
-        <div style="grid-column: 1 / -1; border-top: 1px dashed var(--hairline-color); padding-top: 10px; margin-top: 4px;">
-          <label style="font-weight:600; font-size:12px; margin-bottom:8px; display:block;">{{ "UTM Campaign Builder"|t('tka-nexus') }}</label>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:8px;">
-            {{ forms.textField({
-              placeholder: "utm_source",
-              name: name ~ '[utmParams][utm_source]',
-              value: link.utmParams.utm_source ?? '',
-            }) }}
-            {{ forms.textField({
-              placeholder: "utm_medium",
-              name: name ~ '[utmParams][utm_medium]',
-              value: link.utmParams.utm_medium ?? '',
-            }) }}
-            {{ forms.textField({
-              placeholder: "utm_campaign",
-              name: name ~ '[utmParams][utm_campaign]',
-              value: link.utmParams.utm_campaign ?? '',
-            }) }}
+        <div class="nexus-section-box">
+          <div class="nexus-section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+            {{ "UTM Campaign Tracking"|t('tka-nexus') }}
+          </div>
+          <div class="nexus-utm-grid">
+            <div class="nexus-utm-item">
+              <label>utm_source</label>
+              <input type="text" name="{{ name }}[utmParams][utm_source]" value="{{ link.utmParams.utm_source ?? '' }}" placeholder="newsletter, google">
+            </div>
+            <div class="nexus-utm-item">
+              <label>utm_medium</label>
+              <input type="text" name="{{ name }}[utmParams][utm_medium]" value="{{ link.utmParams.utm_medium ?? '' }}" placeholder="email, cpc">
+            </div>
+            <div class="nexus-utm-item">
+              <label>utm_campaign</label>
+              <input type="text" name="{{ name }}[utmParams][utm_campaign]" value="{{ link.utmParams.utm_campaign ?? '' }}" placeholder="spring_sale">
+            </div>
           </div>
         </div>
       {% endif %}
 
+      <!-- Icon Picker Section -->
       {% if field.allowIcon and icons|length %}
-        <div style="grid-column: 1 / -1; border-top: 1px dashed var(--hairline-color); padding-top: 10px; margin-top: 4px;">
-          <label style="font-weight:600; font-size:12px; margin-bottom:8px; display:block;">{{ "Icon"|t('tka-nexus') }}</label>
-          <input type="hidden" class="nexus-icon-value" name="{{ name }}[icon]" value="{{ link.icon }}">
-          <div class="nexus-icon-grid">
-            {% for iconKey, iconSvg in icons %}
-              <div class="nexus-icon-item {% if link.icon == iconKey %}is-selected{% endif %}" 
-                   data-icon="{{ iconKey }}" 
-                   title="{{ iconKey }}">
-                {{ iconSvg|raw }}
-              </div>
-            {% endfor %}
+        <div class="nexus-section-box">
+          <div class="nexus-section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+            {{ "Icon Selection"|t('tka-nexus') }}
+          </div>
+          <div class="nexus-icon-selector-wrap">
+            <input type="hidden" class="nexus-icon-value" name="{{ name }}[icon]" value="{{ link.icon }}">
+            <div class="nexus-icon-grid">
+              {% for iconKey, iconSvg in icons %}
+                <button type="button" 
+                        class="nexus-icon-item {% if link.icon == iconKey %}is-selected{% endif %}" 
+                        data-icon="{{ iconKey }}" 
+                        title="{{ iconKey }}">
+                  {{ iconSvg|raw }}
+                </button>
+              {% endfor %}
+            </div>
+            <button type="button" class="nexus-clear-icon-btn">{{ "Remove icon selection"|t('tka-nexus') }}</button>
           </div>
         </div>
       {% endif %}
