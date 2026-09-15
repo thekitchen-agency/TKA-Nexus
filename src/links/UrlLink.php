@@ -15,6 +15,10 @@ class UrlLink extends BaseLinkType
 
     public function getUrl(Link $link): ?string
     {
+        if (is_array($link->value) || $link->value === null) {
+            return null;
+        }
+
         $url = trim((string) $link->value);
         if ($url === '') {
             return null;

@@ -15,7 +15,10 @@ class CustomLink extends BaseLinkType
 
     public function getUrl(Link $link): ?string
     {
-        return $link->value ? (string) $link->value : null;
+        if (is_array($link->value) || $link->value === null) {
+            return null;
+        }
+        return (string) $link->value;
     }
 
     public function renderInputHtml(Link $link, array $context): string

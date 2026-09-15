@@ -15,7 +15,7 @@ use Twig\Markup;
 class Link extends Model implements \JsonSerializable, \Stringable
 {
     public ?string $type = null;
-    public mixed $value = null;
+    public ?string $value = null;
     public ?int $elementId = null;
     public ?int $siteId = null;
     public ?string $customText = null;

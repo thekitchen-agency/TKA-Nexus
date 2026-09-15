@@ -15,6 +15,10 @@ class PhoneLink extends BaseLinkType
 
     public function getUrl(Link $link): ?string
     {
+        if (is_array($link->value) || $link->value === null) {
+            return null;
+        }
+
         $phone = trim((string) $link->value);
         if ($phone === '') {
             return null;

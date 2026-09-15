@@ -15,6 +15,10 @@ class EmailLink extends BaseLinkType
 
     public function getUrl(Link $link): ?string
     {
+        if (is_array($link->value) || $link->value === null) {
+            return null;
+        }
+
         $email = trim((string) $link->value);
         if ($email === '') {
             return null;

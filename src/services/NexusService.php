@@ -118,23 +118,25 @@ class NexusService extends Component
 
         // Resolve value based on selected type or direct property
         if ($type && isset($data['values'][$type])) {
-            $link->value = $data['values'][$type];
+            $val = $data['values'][$type];
+            $link->value = is_array($val) ? null : ($val !== null ? (string) $val : null);
         } elseif (isset($data['value'])) {
-            $link->value = $data['value'];
+            $val = $data['value'];
+            $link->value = is_array($val) ? null : ($val !== null ? (string) $val : null);
         }
 
         $link->siteId = isset($data['siteId']) ? (int) $data['siteId'] : ($element ? (int) $element->siteId : null);
-        $link->customText = $data['customText'] ?? ($data['text'] ?? null);
-        $link->title = $data['title'] ?? null;
-        $link->target = $data['target'] ?? null;
-        $link->style = $data['style'] ?? null;
-        $link->icon = $data['icon'] ?? null;
-        $link->anchor = $data['anchor'] ?? null;
-        $link->utmParams = $data['utmParams'] ?? [];
-        $link->subject = $data['subject'] ?? null;
-        $link->body = $data['body'] ?? null;
-        $link->ariaLabel = $data['ariaLabel'] ?? null;
-        $link->customAttributes = $data['customAttributes'] ?? [];
+        $link->customText = isset($data['customText']) && is_string($data['customText']) ? $data['customText'] : (isset($data['text']) && is_string($data['text']) ? $data['text'] : null);
+        $link->title = isset($data['title']) && is_string($data['title']) ? $data['title'] : null;
+        $link->target = isset($data['target']) && is_string($data['target']) ? $data['target'] : null;
+        $link->style = isset($data['style']) && is_string($data['style']) ? $data['style'] : null;
+        $link->icon = isset($data['icon']) && is_string($data['icon']) ? $data['icon'] : null;
+        $link->anchor = isset($data['anchor']) && is_string($data['anchor']) ? $data['anchor'] : null;
+        $link->utmParams = isset($data['utmParams']) && is_array($data['utmParams']) ? $data['utmParams'] : [];
+        $link->subject = isset($data['subject']) && is_string($data['subject']) ? $data['subject'] : null;
+        $link->body = isset($data['body']) && is_string($data['body']) ? $data['body'] : null;
+        $link->ariaLabel = isset($data['ariaLabel']) && is_string($data['ariaLabel']) ? $data['ariaLabel'] : null;
+        $link->customAttributes = isset($data['customAttributes']) && is_array($data['customAttributes']) ? $data['customAttributes'] : [];
 
         return $link;
     }
