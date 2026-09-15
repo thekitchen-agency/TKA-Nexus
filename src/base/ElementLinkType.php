@@ -66,6 +66,29 @@ abstract class ElementLinkType extends BaseLinkType
         }
 
         $element = $this->getElement($link);
-        return $element ? (string) $element->title : null;
+        return $element ? (string) ($element->title ?? $element->slug ?? (string) $element->id) : null;
+    }
+
+    public function renderInputHtml(Link $link, array $context): string
+    {
+        $elementType = static::elementType();
+        $typeHandle = static::identifier();
+        $element = ($link->type === $typeHandle) ? $this->getElement($link) : null;
+        $elements = $element ? [$element] : [];
+        $sources = $context['sources'] ?? null;
+
+        $config = [
+            'name' => $context['name'] . '[elements][' . $typeHandle . ']',
+            'elements' => $elements,
+            'elementType' => $elementType,
+            'limit' => 1,
+            'viewMode' => 'list',
+        ];
+
+        if (!empty($sources) && $sources !== ['*'] && $sources !== '*') {
+            $config['sources'] = $sources;
+        }
+
+        return Craft::$app->getView()->renderTemplate('_includes/forms/elementSelect', $config);
     }
 }
