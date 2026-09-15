@@ -75,13 +75,13 @@
           </div>
         {% endif %}
 
-        {% if field.allowStyle and field.availableStyles|length %}
+        {% if field.allowStyle and styles|length %}
           <div class="nexus-col">
             <label class="nexus-label">{{ "Button / CTA Style"|t('tka-nexus') }}</label>
             <div class="select">
               <select name="{{ name }}[style]">
                 <option value="">{{ "Default Style"|t('tka-nexus') }}</option>
-                {% for styleKey, styleLabel in field.availableStyles %}
+                {% for styleKey, styleLabel in styles %}
                   <option value="{{ styleKey }}" {% if link.style == styleKey %}selected{% endif %}>{{ styleLabel }}</option>
                 {% endfor %}
               </select>

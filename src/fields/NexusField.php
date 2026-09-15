@@ -86,6 +86,25 @@ class NexusField extends Field
         ]);
     }
 
+    public function getFormattedStyles(): array
+    {
+        $styles = [];
+        if (is_array($this->availableStyles)) {
+            foreach ($this->availableStyles as $key => $val) {
+                if (is_array($val)) {
+                    $k = $val['handle'] ?? (string) $key;
+                    $l = $val['label'] ?? $k;
+                    if ($k !== '') {
+                        $styles[$k] = (string) $l;
+                    }
+                } elseif (is_string($val)) {
+                    $styles[(string) $key] = $val;
+                }
+            }
+        }
+        return $styles;
+    }
+
     public function setAvailableStyles(mixed $styles): void
     {
         if (is_array($styles)) {
@@ -192,6 +211,7 @@ class NexusField extends Field
             'link' => $link,
             'currentType' => $currentType,
             'availableTypes' => $availableTypes,
+            'styles' => $this->getFormattedStyles(),
             'icons' => $icons,
             'element' => $element,
         ]);
