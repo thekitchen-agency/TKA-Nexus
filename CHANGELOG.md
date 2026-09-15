@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 1.0.1 - 2026-09-15
+
+### Added
+- Added high-resolution brand icon (`icon.svg`) and monochrome icon mask (`icon-mask.svg`) for Craft Control Panel and Plugin Store integration.
+
 ## 1.0.0 - 2026-09-15
 
 ### Added
