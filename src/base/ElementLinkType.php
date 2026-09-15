@@ -18,10 +18,12 @@ abstract class ElementLinkType extends BaseLinkType
         }
 
         $elementType = static::elementType();
-        $query = $elementType::find()->id($id);
+        $query = $elementType::find()->id($id)->anyStatus();
 
         if ($link->siteId) {
             $query->siteId($link->siteId);
+        } else {
+            $query->siteId('*');
         }
 
         return $query->one();

@@ -28,8 +28,8 @@ class PhoneLink extends BaseLinkType
     public function renderInputHtml(Link $link, array $context): string
     {
         return Craft::$app->getView()->renderTemplate('_includes/forms/text', [
-            'name' => $context['name'] . '[value]',
-            'value' => $link->value,
+            'name' => $context['name'] . '[values][phone]',
+            'value' => ($link->type === 'phone') ? $link->value : '',
             'placeholder' => '+41 44 123 45 67',
             'type' => 'tel',
         ]);

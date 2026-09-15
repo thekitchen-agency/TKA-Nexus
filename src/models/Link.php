@@ -146,11 +146,23 @@ class Link extends Model implements \JsonSerializable, \Stringable
 
     public function getIsEmpty(): bool
     {
-        if (!$this->type) {
+        if (empty($this->type)) {
             return true;
         }
-        $url = $this->getUrl();
-        return empty($url);
+
+        if (!empty($this->elementId)) {
+            return false;
+        }
+
+        if ($this->value !== null && trim((string) $this->value) !== '') {
+            return false;
+        }
+
+        if (!empty($this->customText) || !empty($this->anchor)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

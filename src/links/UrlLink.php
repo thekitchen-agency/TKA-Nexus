@@ -61,8 +61,8 @@ class UrlLink extends BaseLinkType
     public function renderInputHtml(Link $link, array $context): string
     {
         return Craft::$app->getView()->renderTemplate('_includes/forms/text', [
-            'name' => $context['name'] . '[value]',
-            'value' => $link->value,
+            'name' => $context['name'] . '[values][url]',
+            'value' => ($link->type === 'url') ? $link->value : '',
             'placeholder' => 'https://example.com',
         ]);
     }

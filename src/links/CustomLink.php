@@ -21,8 +21,8 @@ class CustomLink extends BaseLinkType
     public function renderInputHtml(Link $link, array $context): string
     {
         return Craft::$app->getView()->renderTemplate('_includes/forms/text', [
-            'name' => $context['name'] . '[value]',
-            'value' => $link->value,
+            'name' => $context['name'] . '[values][custom]',
+            'value' => ($link->type === 'custom') ? $link->value : '',
             'placeholder' => '#section-anchor or /custom/path',
         ]);
     }

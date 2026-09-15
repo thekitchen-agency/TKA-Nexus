@@ -100,14 +100,30 @@ class NexusService extends Component
         return new Link();
     }
 
-    public function createLinkModel(array $data): Link
+    public function createLinkModel(array $data, ?ElementInterface $element = null): Link
     {
         $link = new Link();
 
-        $link->type = $data['type'] ?? null;
-        $link->value = $data['value'] ?? null;
-        $link->elementId = isset($data['elementId']) ? (int) (is_array($data['elementId']) ? ($data['elementId'][0] ?? null) : $data['elementId']) : null;
-        $link->siteId = isset($data['siteId']) ? (int) $data['siteId'] : null;
+        $type = $data['type'] ?? null;
+        $link->type = $type;
+
+        // Resolve elementId based on selected type or direct property
+        if ($type && isset($data['elements'][$type])) {
+            $elemVal = $data['elements'][$type];
+            $link->elementId = !empty($elemVal) ? (int) (is_array($elemVal) ? ($elemVal[0] ?? null) : $elemVal) : null;
+        } elseif (isset($data['elementId'])) {
+            $elemVal = $data['elementId'];
+            $link->elementId = !empty($elemVal) ? (int) (is_array($elemVal) ? ($elemVal[0] ?? null) : $elemVal) : null;
+        }
+
+        // Resolve value based on selected type or direct property
+        if ($type && isset($data['values'][$type])) {
+            $link->value = $data['values'][$type];
+        } elseif (isset($data['value'])) {
+            $link->value = $data['value'];
+        }
+
+        $link->siteId = isset($data['siteId']) ? (int) $data['siteId'] : ($element ? (int) $element->siteId : null);
         $link->customText = $data['customText'] ?? ($data['text'] ?? null);
         $link->title = $data['title'] ?? null;
         $link->target = $data['target'] ?? null;

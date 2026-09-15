@@ -40,8 +40,8 @@ class EmailLink extends BaseLinkType
     public function renderInputHtml(Link $link, array $context): string
     {
         return Craft::$app->getView()->renderTemplate('_includes/forms/text', [
-            'name' => $context['name'] . '[value]',
-            'value' => $link->value,
+            'name' => $context['name'] . '[values][email]',
+            'value' => ($link->type === 'email') ? $link->value : '',
             'placeholder' => 'hello@example.com',
             'type' => 'email',
         ]);

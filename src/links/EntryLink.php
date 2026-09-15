@@ -21,12 +21,12 @@ class EntryLink extends ElementLinkType
 
     public function renderInputHtml(Link $link, array $context): string
     {
-        $element = $this->getElement($link);
+        $element = ($link->type === 'entry') ? $this->getElement($link) : null;
         $elements = $element ? [$element] : [];
         $sources = $context['sources'] ?? null;
 
         return Craft::$app->getView()->renderTemplate('_includes/forms/elementSelect', [
-            'name' => $context['name'] . '[elementId]',
+            'name' => $context['name'] . '[elements][entry]',
             'elements' => $elements,
             'elementType' => Entry::class,
             'limit' => 1,

@@ -25,12 +25,12 @@ class CategoryLink extends ElementLinkType
             return '';
         }
 
-        $element = $this->getElement($link);
+        $element = ($link->type === 'category') ? $this->getElement($link) : null;
         $elements = $element ? [$element] : [];
         $sources = $context['sources'] ?? null;
 
         return Craft::$app->getView()->renderTemplate('_includes/forms/elementSelect', [
-            'name' => $context['name'] . '[elementId]',
+            'name' => $context['name'] . '[elements][category]',
             'elements' => $elements,
             'elementType' => Category::class,
             'limit' => 1,
