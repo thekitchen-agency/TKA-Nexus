@@ -45,7 +45,7 @@
       iconItems.forEach(item => {
         item.addEventListener('click', (e) => {
           e.preventDefault();
-          const iconName = item.dataset.icon;
+          const iconName = item.dataset.nexusIcon;
           const isSelected = item.classList.contains('is-selected');
 
           iconItems.forEach(i => i.classList.remove('is-selected'));

@@ -148,7 +148,7 @@
               {% for iconKey, iconSvg in icons %}
                 <button type="button" 
                         class="nexus-icon-item {% if link.icon == iconKey %}is-selected{% endif %}" 
-                        data-icon="{{ iconKey }}" 
+                        data-nexus-icon="{{ iconKey }}" 
                         title="{{ iconKey }}">
                   {{ iconSvg|raw }}
                 </button>
