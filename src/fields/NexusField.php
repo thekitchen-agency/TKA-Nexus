@@ -34,6 +34,11 @@ class NexusField extends Field
         return Craft::t('tka-nexus', 'Nexus Link');
     }
 
+    public static function icon(): string
+    {
+        return 'link';
+    }
+
     public static function valueType(): string
     {
         return Link::class . '|null';
