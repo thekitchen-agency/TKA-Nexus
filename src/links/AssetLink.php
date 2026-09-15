@@ -39,13 +39,19 @@ class AssetLink extends ElementLinkType
         $elements = $element ? [$element] : [];
         $sources = $context['sources'] ?? null;
 
-        return Craft::$app->getView()->renderTemplate('_includes/forms/elementSelect', [
+        $config = [
             'name' => $context['name'] . '[elements][asset]',
             'elements' => $elements,
             'elementType' => Asset::class,
             'limit' => 1,
-            'sources' => $sources,
             'viewMode' => 'list',
-        ]);
+            'jsClass' => 'Craft.AssetSelectInput',
+        ];
+
+        if (!empty($sources) && $sources !== ['*'] && $sources !== '*') {
+            $config['sources'] = $sources;
+        }
+
+        return Craft::$app->getView()->renderTemplate('_includes/forms/elementSelect', $config);
     }
 }
