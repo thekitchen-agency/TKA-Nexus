@@ -112,7 +112,36 @@ class NexusField extends Field
     {
         $value = $element->getFieldValue($this->handle);
         $targetIds = Nexus::getInstance()->getService()->getElementRelations($value);
-        Craft::$app->getRelations()->saveRelations($this, $element, $targetIds);
+        
+        if ($this->id && $element->id) {
+            $db = Craft::$app->getDb();
+            
+            // Delete old relations for this field & source element
+            $db->createCommand()->delete(\craft\db\Table::RELATIONS, [
+                'fieldId' => $this->id,
+                'sourceId' => $element->id,
+            ])->execute();
+
+            if (!empty($targetIds)) {
+                $rows = [];
+                foreach ($targetIds as $i => $targetId) {
+                    $rows[] = [
+                        $this->id,
+                        $element->id,
+                        $element->siteId,
+                        (int) $targetId,
+                        $i + 1,
+                    ];
+                }
+                $db->createCommand()->batchInsert(\craft\db\Table::RELATIONS, [
+                    'fieldId',
+                    'sourceId',
+                    'sourceSiteId',
+                    'targetId',
+                    'sortOrder',
+                ], $rows)->execute();
+            }
+        }
 
         parent::afterElementSave($element, $isNew);
     }
