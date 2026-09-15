@@ -136,14 +136,58 @@
   display: none !important;
 }
 
-.nexus-grid-2 {
+.nexus-grid-top {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
+  align-items: start;
 }
 
-.nexus-grid-2 .field {
+.nexus-grid-top .field {
   margin-bottom: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.nexus-grid-top .field > .heading {
+  margin-bottom: 6px !important;
+  min-height: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.nexus-grid-top .field label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--text-color, #1e293b) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.nexus-grid-top .field > .input {
+  width: 100% !important;
+}
+
+.nexus-grid-top .select {
+  display: block !important;
+  width: 100% !important;
+}
+
+.nexus-grid-top select {
+  width: 100% !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  box-sizing: border-box !important;
+  background-color: #ffffff !important;
+  border-radius: 5px !important;
+}
+
+.nexus-grid-top input.text {
+  width: 100% !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  box-sizing: border-box !important;
+  border-radius: 5px !important;
 }
 
 .nexus-section-box {
