@@ -35,7 +35,8 @@
     "name": "Nexus",
     "developer": "thekitchen.agency",
     "developerUrl": "https://thekitchen.agency",
-    "documentationUrl": "https://github.com/thekitchen-agency/craft-tka-nexus#readme",
+    "documentationUrl": "https://github.com/thekitchen-agency/TKA-Nexus#readme",
+    "changelogUrl": "https://raw.githubusercontent.com/thekitchen-agency/TKA-Nexus/main/CHANGELOG.md",
     "class": "thekitchenagency\\nexus\\Nexus"
   },
   "scripts": {
