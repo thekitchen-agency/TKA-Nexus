@@ -64,55 +64,50 @@
       <!-- General Link Properties Grid -->
       <div class="nexus-grid-top">
         {% if field.allowTarget %}
-          {{ forms.selectField({
-            label: "Target"|t('tka-nexus'),
-            name: name ~ '[target]',
-            value: link.target ?: field.defaultTarget,
-            options: [
-              { label: "Same Tab (_self)"|t('tka-nexus'), value: '_self' },
-              { label: "New Tab (_blank)"|t('tka-nexus'), value: '_blank' },
-            ]
-          }) }}
+          <div class="nexus-col">
+            <label class="nexus-label">{{ "Target"|t('tka-nexus') }}</label>
+            <div class="select">
+              <select name="{{ name }}[target]">
+                <option value="_self" {% if (link.target ?: field.defaultTarget) == '_self' %}selected{% endif %}>{{ "Same Tab (_self)"|t('tka-nexus') }}</option>
+                <option value="_blank" {% if (link.target ?: field.defaultTarget) == '_blank' %}selected{% endif %}>{{ "New Tab (_blank)"|t('tka-nexus') }}</option>
+              </select>
+            </div>
+          </div>
         {% endif %}
 
         {% if field.allowStyle and field.availableStyles|length %}
-          {% set styleOptions = [{ label: "Default Style"|t('tka-nexus'), value: '' }] %}
-          {% for styleKey, styleLabel in field.availableStyles %}
-            {% set styleOptions = styleOptions|merge([{ label: styleLabel, value: styleKey }]) %}
-          {% endfor %}
-          {{ forms.selectField({
-            label: "Button / CTA Style"|t('tka-nexus'),
-            name: name ~ '[style]',
-            value: link.style,
-            options: styleOptions,
-          }) }}
+          <div class="nexus-col">
+            <label class="nexus-label">{{ "Button / CTA Style"|t('tka-nexus') }}</label>
+            <div class="select">
+              <select name="{{ name }}[style]">
+                <option value="">{{ "Default Style"|t('tka-nexus') }}</option>
+                {% for styleKey, styleLabel in field.availableStyles %}
+                  <option value="{{ styleKey }}" {% if link.style == styleKey %}selected{% endif %}>{{ styleLabel }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
         {% endif %}
 
         {% if field.allowAnchor %}
-          {{ forms.textField({
-            label: "Anchor / Jump Link"|t('tka-nexus'),
-            name: name ~ '[anchor]',
-            value: link.anchor,
-            placeholder: "#section-name",
-          }) }}
+          <div class="nexus-col">
+            <label class="nexus-label">{{ "Anchor / Jump Link"|t('tka-nexus') }}</label>
+            <input type="text" class="text" name="{{ name }}[anchor]" value="{{ link.anchor }}" placeholder="#section-name">
+          </div>
         {% endif %}
 
         {% if field.allowAriaLabel %}
-          {{ forms.textField({
-            label: "Aria Label"|t('tka-nexus'),
-            name: name ~ '[ariaLabel]',
-            value: link.ariaLabel,
-            placeholder: "Accessibility label",
-          }) }}
+          <div class="nexus-col">
+            <label class="nexus-label">{{ "Aria Label"|t('tka-nexus') }}</label>
+            <input type="text" class="text" name="{{ name }}[ariaLabel]" value="{{ link.ariaLabel }}" placeholder="Accessibility label">
+          </div>
         {% endif %}
 
         {% if field.allowTitle %}
-          {{ forms.textField({
-            label: "Title Attribute"|t('tka-nexus'),
-            name: name ~ '[title]',
-            value: link.title,
-            placeholder: "Hover title",
-          }) }}
+          <div class="nexus-col">
+            <label class="nexus-label">{{ "Title Attribute"|t('tka-nexus') }}</label>
+            <input type="text" class="text" name="{{ name }}[title]" value="{{ link.title }}" placeholder="Hover title">
+          </div>
         {% endif %}
       </div>
 
@@ -159,7 +154,10 @@
                 </button>
               {% endfor %}
             </div>
-            <button type="button" class="nexus-clear-icon-btn">{{ "Remove icon selection"|t('tka-nexus') }}</button>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:4px;">
+              <span class="nexus-icon-name-display" style="font-size:11px; font-weight:600; color:#2563eb;">{{ link.icon ?: '' }}</span>
+              <button type="button" class="nexus-clear-icon-btn">{{ "Remove icon selection"|t('tka-nexus') }}</button>
+            </div>
           </div>
         </div>
       {% endif %}

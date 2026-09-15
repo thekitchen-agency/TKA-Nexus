@@ -11,6 +11,7 @@
     const iconItems = container.querySelectorAll('.nexus-icon-item');
     const iconHidden = container.querySelector('.nexus-icon-value');
     const clearIconBtn = container.querySelector('.nexus-clear-icon-btn');
+    const iconNameDisplay = container.querySelector('.nexus-icon-name-display');
 
     // Type tab switching
     typeTabs.forEach(tab => {
@@ -51,9 +52,11 @@
 
           if (isSelected) {
             iconHidden.value = '';
+            if (iconNameDisplay) iconNameDisplay.textContent = '';
           } else {
             item.classList.add('is-selected');
             iconHidden.value = iconName;
+            if (iconNameDisplay) iconNameDisplay.textContent = iconName;
           }
         });
       });
@@ -65,6 +68,7 @@
         e.preventDefault();
         iconItems.forEach(i => i.classList.remove('is-selected'));
         iconHidden.value = '';
+        if (iconNameDisplay) iconNameDisplay.textContent = '';
       });
     }
   }
