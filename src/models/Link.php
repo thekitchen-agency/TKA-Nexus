@@ -27,7 +27,11 @@ class Link extends Model implements \JsonSerializable, \Stringable
     public ?array $utmParams = [];
     public ?string $subject = null;
     public ?string $body = null;
+    public ?string $message = null;
     public ?string $ariaLabel = null;
+    public bool $relNofollow = false;
+    public bool $relSponsored = false;
+    public bool $relUgc = false;
     public ?array $customAttributes = [];
 
     protected ?LinkTypeInterface $_linkType = null;
@@ -37,8 +41,9 @@ class Link extends Model implements \JsonSerializable, \Stringable
     public function rules(): array
     {
         return [
-            [['type', 'value', 'customText', 'title', 'target', 'style', 'icon', 'anchor', 'subject', 'body', 'ariaLabel'], 'string'],
+            [['type', 'value', 'customText', 'title', 'target', 'style', 'icon', 'anchor', 'subject', 'body', 'message', 'ariaLabel'], 'string'],
             [['elementId', 'siteId'], 'integer'],
+            [['relNofollow', 'relSponsored', 'relUgc'], 'boolean'],
             [['utmParams', 'customAttributes'], 'safe'],
         ];
     }
@@ -144,6 +149,79 @@ class Link extends Model implements \JsonSerializable, \Stringable
         return false;
     }
 
+    public function getIsAsset(): bool
+    {
+        return $this->type === 'asset' || ($this->getElement() instanceof \craft\elements\Asset);
+    }
+
+    public function getExtension(): ?string
+    {
+        $element = $this->getElement();
+        if ($element instanceof \craft\elements\Asset) {
+            return strtoupper((string) $element->getExtension());
+        }
+        return null;
+    }
+
+    public function getFileSize(): ?int
+    {
+        $element = $this->getElement();
+        if ($element instanceof \craft\elements\Asset) {
+            return (int) $element->size;
+        }
+        return null;
+    }
+
+    public function getFormattedFileSize(): ?string
+    {
+        $size = $this->getFileSize();
+        if ($size !== null && $size > 0) {
+            return Craft::$app->getFormatter()->asShortSize($size);
+        }
+        return null;
+    }
+
+    public function getMimeType(): ?string
+    {
+        $element = $this->getElement();
+        if ($element instanceof \craft\elements\Asset) {
+            return (string) $element->mimeType;
+        }
+        return null;
+    }
+
+    public function getIsDownload(): bool
+    {
+        return $this->getIsAsset();
+    }
+
+    /**
+     * Compute the compiled rel attribute based on target and SEO flags.
+     */
+    public function getRel(): ?string
+    {
+        $parts = [];
+
+        if ($this->target === '_blank') {
+            $parts[] = 'noopener';
+            $parts[] = 'noreferrer';
+        }
+
+        if ($this->relNofollow) {
+            $parts[] = 'nofollow';
+        }
+
+        if ($this->relSponsored) {
+            $parts[] = 'sponsored';
+        }
+
+        if ($this->relUgc) {
+            $parts[] = 'ugc';
+        }
+
+        return !empty($parts) ? implode(' ', array_unique($parts)) : null;
+    }
+
     public function getIsEmpty(): bool
     {
         if (empty($this->type)) {
@@ -183,6 +261,19 @@ class Link extends Model implements \JsonSerializable, \Stringable
         $text = $attributes['text'] ?? $this->getText();
         unset($attributes['text']);
 
+        // Handle appendFileInfo option for asset downloads
+        $appendFileInfo = $attributes['appendFileInfo'] ?? false;
+        unset($attributes['appendFileInfo']);
+
+        if ($appendFileInfo && $this->getIsAsset()) {
+            $ext = $this->getExtension();
+            $size = $this->getFormattedFileSize();
+            $infoParts = array_filter([$ext, $size]);
+            if (!empty($infoParts)) {
+                $text .= ' (' . implode(', ', $infoParts) . ')';
+            }
+        }
+
         $defaultAttributes = [
             'href' => $url,
         ];
@@ -191,8 +282,19 @@ class Link extends Model implements \JsonSerializable, \Stringable
         $target = $attributes['target'] ?? $this->target;
         if ($target) {
             $defaultAttributes['target'] = $target;
-            if ($target === '_blank') {
-                $defaultAttributes['rel'] = 'noopener noreferrer';
+        }
+
+        // Handle rel
+        $rel = $attributes['rel'] ?? $this->getRel();
+        if ($rel) {
+            $defaultAttributes['rel'] = $rel;
+        }
+
+        // Handle download attribute
+        if (isset($attributes['download'])) {
+            if ($attributes['download'] === true) {
+                $defaultAttributes['download'] = '';
+                unset($attributes['download']);
             }
         }
 
@@ -200,7 +302,6 @@ class Link extends Model implements \JsonSerializable, \Stringable
         if ($this->style && !isset($attributes['class'])) {
             $defaultAttributes['class'] = 'btn btn-' . $this->style;
         } elseif ($this->style && isset($attributes['class'])) {
-            // Append or prepend style
             if (!str_contains($attributes['class'], 'btn-' . $this->style)) {
                 $attributes['class'] = trim($attributes['class'] . ' btn-' . $this->style);
             }
@@ -264,7 +365,11 @@ class Link extends Model implements \JsonSerializable, \Stringable
             'utmParams' => $this->utmParams,
             'subject' => $this->subject,
             'body' => $this->body,
+            'message' => $this->message,
             'ariaLabel' => $this->ariaLabel,
+            'relNofollow' => (bool) $this->relNofollow,
+            'relSponsored' => (bool) $this->relSponsored,
+            'relUgc' => (bool) $this->relUgc,
             'customAttributes' => $this->customAttributes,
         ];
     }

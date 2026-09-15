@@ -16,6 +16,8 @@ use thekitchenagency\nexus\links\EmailLink;
 use thekitchenagency\nexus\links\EntryLink;
 use thekitchenagency\nexus\links\PhoneLink;
 use thekitchenagency\nexus\links\UrlLink;
+use thekitchenagency\nexus\links\UserLink;
+use thekitchenagency\nexus\links\WhatsAppLink;
 use thekitchenagency\nexus\models\Link;
 
 class NexusService extends Component
@@ -34,9 +36,11 @@ class NexusService extends Component
             'entry' => EntryLink::class,
             'asset' => AssetLink::class,
             'category' => CategoryLink::class,
+            'user' => UserLink::class,
             'url' => UrlLink::class,
             'email' => EmailLink::class,
             'phone' => PhoneLink::class,
+            'whatsapp' => WhatsAppLink::class,
             'custom' => CustomLink::class,
         ];
 
@@ -135,7 +139,11 @@ class NexusService extends Component
         $link->utmParams = isset($data['utmParams']) && is_array($data['utmParams']) ? $data['utmParams'] : [];
         $link->subject = isset($data['subject']) && is_string($data['subject']) ? $data['subject'] : null;
         $link->body = isset($data['body']) && is_string($data['body']) ? $data['body'] : null;
+        $link->message = isset($data['message']) && is_string($data['message']) ? $data['message'] : null;
         $link->ariaLabel = isset($data['ariaLabel']) && is_string($data['ariaLabel']) ? $data['ariaLabel'] : null;
+        $link->relNofollow = !empty($data['relNofollow']);
+        $link->relSponsored = !empty($data['relSponsored']);
+        $link->relUgc = !empty($data['relUgc']);
         $link->customAttributes = isset($data['customAttributes']) && is_array($data['customAttributes']) ? $data['customAttributes'] : [];
 
         return $link;

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 1.1.0 - 2026-09-15
+
+### Added
+- **Headless & GraphQL Support:** First-class `NexusLink` GraphQL schema type in Craft Pro.
+- **Asset Superpowers & Download Helpers:** Added `.extension`, `.fileSize`, `.formattedFileSize`, `.mimeType`, `download: true`, and `appendFileInfo: true` support.
+- **Modern Link Types:** Added **WhatsApp** (`https://wa.me/...` with message builder) and **User** (link to Craft Users) link types.
+- **SEO & Accessibility (a11y):** Added `rel="nofollow"`, `rel="sponsored"`, `rel="ugc"` directives and dedicated `aria-label` input.
+- **CLI Broken Link Checker:** Added `php craft tka-nexus/links/check` console command for auditing site-wide link health and missing elements.
+- **CP UI Polish:** Added element status indicators (Draft, Disabled) and asset metadata badges in the field preview bar.
+
 ## 1.0.1 - 2026-09-15
 
 ### Added

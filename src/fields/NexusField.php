@@ -6,21 +6,25 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\helpers\ArrayHelper;
+use GraphQL\Type\Definition\Type;
+use thekitchenagency\nexus\gql\types\NexusLinkType;
 use thekitchenagency\nexus\models\Link;
 use thekitchenagency\nexus\Nexus;
 use thekitchenagency\nexus\web\assets\NexusAsset;
 
 class NexusField extends Field
 {
-    public array $allowedLinkTypes = ['entry', 'asset', 'url', 'email', 'phone', 'custom'];
+    public array $allowedLinkTypes = ['entry', 'asset', 'category', 'user', 'url', 'email', 'phone', 'whatsapp', 'custom'];
     public array $allowedSources = ['*'];
     public bool $allowCustomText = true;
     public bool $allowTarget = true;
     public bool $allowTitle = false;
     public bool $allowAriaLabel = true;
+    public bool $allowRel = true;
     public bool $allowAnchor = true;
     public bool $allowUtm = true;
     public bool $allowStyle = false;
+    public string $layoutMode = 'standard';
     public array $availableStyles = [
         'primary' => 'Primary Button',
         'secondary' => 'Secondary Button',
@@ -48,9 +52,14 @@ class NexusField extends Field
     {
         return array_merge(parent::rules(), [
             [['allowedLinkTypes', 'allowedSources', 'availableStyles'], 'safe'],
-            [['allowCustomText', 'allowTarget', 'allowTitle', 'allowAriaLabel', 'allowAnchor', 'allowUtm', 'allowStyle', 'allowIcon'], 'boolean'],
-            [['defaultTarget'], 'string'],
+            [['allowCustomText', 'allowTarget', 'allowTitle', 'allowAriaLabel', 'allowRel', 'allowAnchor', 'allowUtm', 'allowStyle', 'allowIcon'], 'boolean'],
+            [['defaultTarget', 'layoutMode'], 'string'],
         ]);
+    }
+
+    public function getContentGqlType(): \GraphQL\Type\Definition\Type|\craft\gql\base\ObjectType
+    {
+        return NexusLinkType::getType();
     }
 
     public function getSettingsHtml(bool $inline = false): ?string

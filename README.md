@@ -1,8 +1,8 @@
 # TKA Nexus (`thekitchen-agency/craft-tka-nexus`)
 
-A modern, high-performance link and CTA field plugin for **Craft CMS 5** by **thekitchen.agency**.
+A modern, high-performance link, CTA, and media field plugin for **Craft CMS 5** by **thekitchen.agency**.
 
-Designed as a lightweight, zero-bloat replacement for legacy link plugins with native Craft 5 architecture, intelligent fallback handling, CTA button styles, integrated SVG icon picking, and automatic relation indexing.
+Designed as a lightweight, zero-bloat replacement for legacy link plugins with native Craft 5 architecture, intelligent fallback handling, CTA button styles, integrated SVG icon picking, Asset download superpowers, Headless GraphQL support, and automatic relation indexing.
 
 ---
 
@@ -16,15 +16,13 @@ Designed as a lightweight, zero-bloat replacement for legacy link plugins with n
 ## Installation
 
 ### 1. Require the Package
-In your Craft project's `composer.json`, add the repository (if using local development) and require the package:
-
 ```bash
 composer require thekitchen-agency/craft-tka-nexus
 ```
 
-*(For DDEV local plugin development with path repository:)*
+*(For local plugin development with VCS repository in `composer.json`:)*
 ```bash
-ddev composer require thekitchen-agency/craft-tka-nexus:"*@dev"
+composer require thekitchen-agency/craft-tka-nexus:"^1.1"
 ```
 
 ### 2. Install the Plugin
@@ -41,23 +39,31 @@ php craft plugin/install tka-nexus
   - **Entry:** Internal entries with section/type filtering & multi-site support.
   - **Asset:** Files & media with thumbnail browsing, folder navigation, and volume restrictions.
   - **Category:** Category element linking.
+  - **User:** Link directly to Craft User profiles and author accounts.
+  - **WhatsApp:** Direct WhatsApp chat links (`https://wa.me/...`) with optional pre-filled message builder.
   - **Custom URL:** External links with automatic `https://` protocol handling.
   - **Email:** `mailto:` links with optional pre-filled subject and body.
   - **Phone:** `tel:` links with phone number sanitization.
   - **Custom / Anchor:** Page anchors (`#section`) or standalone URIs.
-- **Smart Fallback Text:** If no custom link text is provided by the editor, it automatically defaults to the target Entry title or Asset filename.
-- **Auto-Security Defaults:** Whenever `target="_blank"` is selected, `rel="noopener noreferrer"` is automatically injected.
-- **Built-In CTA Button Styles:** Define style presets (e.g. *Primary*, *Secondary*, *Ghost*, *Outline*) that editors can select directly.
-- **UTM Campaign Builder:** Expandable campaign tracking parameters (`utm_source`, `utm_medium`, `utm_campaign`) appended directly to external URLs.
+- **Asset Superpowers & Download Helpers:**
+  - Direct access to `.extension` (`PDF`, `ZIP`), `.fileSize`, `.formattedFileSize` (`2.4 MB`), and `.mimeType`.
+  - Automatic `download` attribute and `appendFileInfo` label formatting in Twig.
+- **SEO & Accessibility (a11y):**
+  - Search engine directives: `rel="nofollow"`, `rel="sponsored"`, `rel="ugc"`.
+  - Dedicated `ariaLabel` field in Control Panel for screen reader accessibility.
+  - Intelligent `rel` generation combining `noopener noreferrer` for `_blank`.
+- **Headless & GraphQL Support:** First-class `NexusLink` type in Craft Pro's GraphQL schema.
+- **Built-In CTA Button Styles:** Define style presets (e.g. *Primary*, *Secondary*, *Ghost*, *Outline*) selectable directly in the CP.
+- **UTM Campaign Builder:** Campaign tracking parameters (`utm_source`, `utm_medium`, `utm_campaign`) appended directly to external URLs.
 - **Integrated Icon Picker:** Visual SVG icon picker with built-in Lucide icons or custom SVG icons from your theme.
-- **Active & External State Helpers:** Direct boolean helpers for menu active states and outbound link indicators.
+- **CLI Tools:** Built-in migration from `verbb/hyper` and a health check audit command (`php craft tka-nexus/links/check`).
 
 ---
 
 ## Twig API & Usage Examples
 
 ### 1. Automatic Tag Generation (`.link()`)
-Generates the complete `<a href="...">...</a>` HTML tag with all attributes and security headers:
+Generates the complete `<a href="...">...</a>` HTML tag with all attributes, style classes, and security headers:
 
 ```twig
 {# Output: <a href="https://example.com" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Learn More</a> #}
@@ -69,7 +75,26 @@ Generates the complete `<a href="...">...</a>` HTML tag with all attributes and 
 
 ---
 
-### 2. Manual HTML Tag & Property Access
+### 2. Asset Downloads with File Info
+When linking to an Asset (e.g. PDF brochure, specification sheet, media):
+
+```twig
+{# Renders: <a href="..." download>Download Catalog (PDF, 2.4 MB)</a> #}
+{{ entry.catalogLink.link({
+  download: true,
+  appendFileInfo: true
+}) }}
+
+{# Or access file metadata directly #}
+{% if entry.catalogLink.isAsset %}
+  <span class="file-badge">{{ entry.catalogLink.extension }}</span>
+  <span class="file-size">{{ entry.catalogLink.formattedFileSize }}</span>
+{% endif %}
+```
+
+---
+
+### 3. Manual HTML Tag & Granular Property Access
 Full granular control over HTML markup and classes:
 
 ```twig
@@ -78,9 +103,10 @@ Full granular control over HTML markup and classes:
 {% if not link.isEmpty %}
   <a href="{{ link.url }}"
      {% if link.target %}target="{{ link.target }}"{% endif %}
-     class="nav-link {{ link.isActive ? 'is-active' : '' }} {{ link.style ? 'btn-' ~ link.style : '' }}"
+     {% if link.rel %}rel="{{ link.rel }}"{% endif %}
      {% if link.ariaLabel %}aria-label="{{ link.ariaLabel }}"{% endif %}
-     {% if link.title %}title="{{ link.title }}"{% endif %}>
+     {% if link.title %}title="{{ link.title }}"{% endif %}
+     class="nav-link {{ link.isActive ? 'is-active' : '' }} {{ link.style ? 'btn-' ~ link.style : '' }}">
     
     {# Render SVG Icon if selected #}
     {% if link.icon %}
@@ -100,8 +126,21 @@ Full granular control over HTML markup and classes:
 
 ---
 
-### 3. Accessing the Target Element
-When linking to internal Craft Elements (Entries or Assets), you can access the underlying Element model directly:
+### 4. WhatsApp & Direct Messaging
+When a WhatsApp link type is configured with phone number and optional message:
+
+```twig
+{# Automatically generates https://wa.me/41791234567?text=Hello%20there #}
+<a href="{{ entry.contactLink.url }}" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+  {{ entry.contactLink.renderIcon() }}
+  <span>{{ entry.contactLink.text ?: 'Chat on WhatsApp' }}</span>
+</a>
+```
+
+---
+
+### 5. Accessing the Target Element
+Access the underlying Element model directly (Entry, Asset, Category, or User):
 
 ```twig
 {% set targetElement = entry.buttonLink.element %}
@@ -109,15 +148,15 @@ When linking to internal Craft Elements (Entries or Assets), you can access the 
 {% if targetElement and entry.buttonLink.type == 'entry' %}
   <p>Published on: {{ targetElement.postDate|date('short') }}</p>
   <p>Author: {{ targetElement.author.fullName }}</p>
-{% elseif targetElement and entry.buttonLink.type == 'asset' %}
-  <p>File Size: {{ targetElement.formattedSize }}</p>
-  <p>Extension: {{ targetElement.extension|upper }}</p>
+{% elseif targetElement and entry.buttonLink.type == 'user' %}
+  <p>Author Name: {{ targetElement.fullName }}</p>
+  <p>Email: {{ targetElement.email }}</p>
 {% endif %}
 ```
 
 ---
 
-### 4. Standalone Global Twig Functions & Filters
+### 6. Standalone Twig Helpers
 
 ```twig
 {# Standalone icon helper #}
@@ -129,75 +168,93 @@ When linking to internal Craft Elements (Entries or Assets), you can access the 
 
 ---
 
+## Headless & GraphQL Support
+
+TKA Nexus registers a native `NexusLink` object in Craft Pro's GraphQL schema:
+
+```graphql
+query GetPageData {
+  entries(section: "pages") {
+    ... on Page {
+      ctaLink {
+        type
+        url
+        text
+        customText
+        title
+        target
+        rel
+        style
+        icon
+        ariaLabel
+        isExternal
+        isActive
+        isAsset
+        extension
+        fileSize
+        formattedFileSize
+        mimeType
+        element {
+          id
+          title
+          url
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
 ## Model Properties Reference
 
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `link.url` | `string\|null` | The fully resolved destination URL (including protocol, UTMs, and hash). |
-| `link.text` | `string\|null` | The display text (falls back to target Entry title or Asset filename). |
-| `link.customText` | `string\|null` | The raw custom text override entered by the editor. |
-| `link.type` | `string` | Link type handle: `entry`, `asset`, `category`, `url`, `email`, `phone`, `custom`. |
-| `link.elementId` | `int\|null` | Target element ID (for Entry, Asset, or Category links). |
+| `link.url` | `string\|null` | Fully resolved destination URL (with protocols, UTM params, or hash). |
+| `link.text` | `string\|null` | Display label (with automatic fallback to target element title or file name). |
+| `link.customText` | `string\|null` | Custom text override entered by the editor. |
+| `link.type` | `string` | Type identifier: `entry`, `asset`, `category`, `user`, `whatsapp`, `url`, `email`, `phone`, `custom`. |
+| `link.elementId` | `int\|null` | Target element ID (for Entry, Asset, Category, or User links). |
 | `link.element` | `ElementInterface\|null` | The resolved Craft element object. |
-| `link.target` | `string\|null` | Window target (`_self` or `_blank`). |
-| `link.style` | `string\|null` | Selected button style key (e.g., `primary`, `secondary`, `ghost`). |
-| `link.icon` | `string\|null` | Selected icon identifier (e.g., `arrow-right`, `external-link`). |
-| `link.anchor` | `string\|null` | Page jump anchor (e.g., `#contact-form`). |
-| `link.utmParams` | `array` | Dictionary of UTM parameters (`utm_source`, `utm_medium`, `utm_campaign`). |
-| `link.ariaLabel` | `string\|null` | Accessibility label. |
-| `link.title` | `string\|null` | Hover title attribute. |
+| `link.target` | `string\|null` | Target window (`_self` or `_blank`). |
+| `link.rel` | `string\|null` | Computed `rel` attribute (`noopener noreferrer`, `nofollow`, `sponsored`, `ugc`). |
+| `link.relNofollow` | `bool` | Whether `nofollow` directive is enabled. |
+| `link.relSponsored` | `bool` | Whether `sponsored` directive is enabled. |
+| `link.relUgc` | `bool` | Whether `ugc` directive is enabled. |
+| `link.style` | `string\|null` | Selected button style key (e.g. `primary`, `secondary`, `ghost`). |
+| `link.icon` | `string\|null` | Selected icon identifier. |
+| `link.anchor` | `string\|null` | Page jump anchor (e.g. `#contact`). |
+| `link.ariaLabel` | `string\|null` | Screen reader accessibility label. |
 | `link.isExternal` | `bool` | Returns `true` if the URL points to an external domain. |
-| `link.isActive` | `bool` | Returns `true` if the URL matches the current request URI. |
+| `link.isActive` | `bool` | Returns `true` if the URL matches current request URI. |
+| `link.isAsset` | `bool` | Returns `true` if destination is an Asset. |
+| `link.extension` | `string\|null` | Uppercase asset file extension (`PDF`, `ZIP`, `JPG`). |
+| `link.fileSize` | `int\|null` | File size in raw bytes. |
+| `link.formattedFileSize` | `string\|null` | Formatted file size (`2.4 MB`, `850 KB`). |
+| `link.mimeType` | `string\|null` | MIME type string (`application/pdf`). |
 | `link.isEmpty` | `bool` | Returns `true` if no destination has been set. |
 
 ---
 
-## Field Settings Configuration
+## CLI Commands
 
-When adding or editing a **Nexus Link** field in the Craft Control Panel:
+### 1. Link Health & Integrity Checker
+Scans all Nexus fields across your site to detect deleted target elements, drafts, or broken 404 URLs:
 
-1. **Allowed Link Types:** Choose which tabs (Entry, Asset, URL, Email, Phone, Custom) are accessible to editors.
-2. **Allow Custom Text:** Toggle whether editors can override the link text.
-3. **Allow CTA / Button Styles:** Enable style presets and define available classes:
-   - `primary` &rarr; `Primary Button`
-   - `secondary` &rarr; `Secondary Button`
-   - `ghost` &rarr; `Ghost Button`
-4. **Allow Icon Picker:** Enable the visual SVG icon picker.
-5. **Allow Page Anchors:** Enable the `#anchor` jump link field.
-6. **Allow UTM Parameters:** Enable the campaign tracking builder for external URLs.
+```bash
+php craft tka-nexus/links/check
+```
 
----
+Options:
+* `--check-external=0` : Skip HTTP HEAD requests to external URLs for faster offline scanning.
 
-## Custom Icons
-
-In addition to the built-in Lucide SVG icons (`arrow-right`, `arrow-up-right`, `external-link`, `download`, `mail`, `phone`, `globe`, `chevron-right`, `file-text`, `sparkles`, `calendar`, `user`), you can add custom project icons:
-
-1. Place your `.svg` files in your web root under `web/icons/`:
-   ```
-   web/
-   └── icons/
-       ├── custom-logo.svg
-       └── checkmark.svg
-   ```
-2. Render in Twig:
-   ```twig
-   {{ nexusIcon('custom-logo', { class: 'w-6 h-6' }) }}
-   ```
-
----
-
-## Migrating from Verbb Hyper
-
-If you are migrating an existing project from `verbb/hyper` to `tka-nexus`, run the built-in migration command:
+### 2. Migrating from Verbb Hyper
+Converts existing `verbb/hyper` fields to `tka-nexus` without losing configurations:
 
 ```bash
 php craft tka-nexus/migrate/from-hyper
 ```
-
-This command automatically:
-* Scans for all existing `verbb\hyper\fields\HyperField` fields.
-* Converts field definitions and layouts to `thekitchenagency\nexus\fields\NexusField`.
-* Preserves field handles, instructions, and translation settings.
 
 ---
 
@@ -205,4 +262,5 @@ This command automatically:
 
 * **Author:** thekitchen.agency
 * **License:** Proprietary / Private
+* **Repository:** [https://github.com/thekitchen-agency/TKA-Nexus](https://github.com/thekitchen-agency/TKA-Nexus)
 * **Support:** tech@thekitchen.agency

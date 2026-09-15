@@ -51,10 +51,21 @@
 
     <!-- Resolved Destination Bar -->
     {% if link.url %}
-      <div class="nexus-preview-bar">
+      <div class="nexus-preview-bar" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
         <span><strong>{{ "Resolved URL:"|t('tka-nexus') }}</strong> <span class="nexus-preview-url">{{ link.url }}</span></span>
         {% if link.isExternal %}
           <span class="badge" style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600;">External</span>
+        {% endif %}
+        {% if link.isAsset and link.formattedFileSize %}
+          <span class="badge" style="background:#f1f5f9; color:#475569; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600;">
+            {{ link.extension }} &bull; {{ link.formattedFileSize }}
+          </span>
+        {% endif %}
+        {% set targetElement = link.element %}
+        {% if targetElement and targetElement.status is defined and targetElement.status != 'enabled' %}
+          <span class="badge" style="background:#fef3c7; color:#92400e; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600;">
+            Target: {{ targetElement.status|capitalize }}
+          </span>
         {% endif %}
       </div>
     {% endif %}
@@ -99,7 +110,7 @@
         {% if field.allowAriaLabel %}
           <div class="nexus-col">
             <label class="nexus-label">{{ "Aria Label"|t('tka-nexus') }}</label>
-            <input type="text" class="text" name="{{ name }}[ariaLabel]" value="{{ link.ariaLabel }}" placeholder="Accessibility label">
+            <input type="text" class="text" name="{{ name }}[ariaLabel]" value="{{ link.ariaLabel }}" placeholder="Screen reader label">
           </div>
         {% endif %}
 
@@ -110,6 +121,30 @@
           </div>
         {% endif %}
       </div>
+
+      <!-- SEO Rel Section -->
+      {% if field.allowRel %}
+        <div class="nexus-section-box" style="margin-top:12px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;">
+          <div class="nexus-section-title" style="font-size:12px; font-weight:600; color:#334155; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            {{ "SEO & Search Engine Directives"|t('tka-nexus') }}
+          </div>
+          <div style="display:flex; gap:16px; flex-wrap:wrap;">
+            <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" name="{{ name }}[relNofollow]" value="1" {% if link.relNofollow %}checked{% endif %}>
+              <span><code>rel="nofollow"</code> (Search engines ignore)</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" name="{{ name }}[relSponsored]" value="1" {% if link.relSponsored %}checked{% endif %}>
+              <span><code>rel="sponsored"</code> (Paid / affiliate link)</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" name="{{ name }}[relUgc]" value="1" {% if link.relUgc %}checked{% endif %}>
+              <span><code>rel="ugc"</code> (User generated content)</span>
+            </label>
+          </div>
+        </div>
+      {% endif %}
 
       <!-- UTM Builder Section -->
       {% if field.allowUtm %}
